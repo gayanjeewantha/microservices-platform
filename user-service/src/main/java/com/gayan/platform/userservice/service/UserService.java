@@ -1,19 +1,33 @@
 package com.gayan.platform.userservice.service;
 
+import com.gayan.platform.userservice.dto.UserDTO;
+import com.gayan.platform.userservice.mapper.UserMapper;
 import com.gayan.platform.userservice.model.User;
+import com.gayan.platform.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final Map<Long, User> users = new HashMap<>();
 
-    public List<User> getAll() {
-        return new ArrayList<>(users.values());
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public User create(User user) {
-        users.put(user.getId(), user);
-        return user;
+    public List<UserDTO> getAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public UserDTO create(UserDTO dto) {
+        User user = UserMapper.toEntity(dto);
+        User saved = userRepository.save(user);
+        return UserMapper.toDTO(saved);
     }
 }

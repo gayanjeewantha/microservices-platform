@@ -1,13 +1,15 @@
 package com.gayan.platform.userservice.controller;
 
-import com.gayan.platform.userservice.model.User;
+import com.gayan.platform.userservice.dto.UserDTO;
 import com.gayan.platform.userservice.service.UserService;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -15,12 +17,12 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAll() {
+    public List<UserDTO> getAll() {
         return userService.getAll();
     }
 
     @PostMapping
-    public User create(@RequestBody User user) {
-        return userService.create(user);
+    public UserDTO create(@RequestBody UserDTO userDTO) {
+        return userService.create(userDTO);
     }
 }
