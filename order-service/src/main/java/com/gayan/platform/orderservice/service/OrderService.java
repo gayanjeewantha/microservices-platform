@@ -6,6 +6,7 @@ import com.gayan.platform.orderservice.dto.OrderDTO;
 import com.gayan.platform.orderservice.mapper.OrderMapper;
 import com.gayan.platform.orderservice.model.Order;
 import com.gayan.platform.orderservice.repository.OrderRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +22,7 @@ public class OrderService {
         this.inventoryClient = inventoryClient;
     }
 
+    @CircuitBreaker(name = "inventoryService", fallbackMethod = "createOrderFallback")
     public OrderDTO createOrder(OrderDTO dto) {
         userClient.getAllUsers();
         inventoryClient.getAllProducts();
@@ -28,5 +30,9 @@ public class OrderService {
         Order order = OrderMapper.toEntity(dto);
         Order saved = orderRepository.save(order);
         return OrderMapper.toDTO(saved);
+    }
+
+    public OrderDTO createOrderFallback(OrderDTO dto, Throwable t) {
+        throw new RuntimeException("Order service temporarily unavailable — inventory or user service is down");
     }
 }
